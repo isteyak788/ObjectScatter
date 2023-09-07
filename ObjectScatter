@@ -1,0 +1,67 @@
+using UnityEngine;
+using UnityEditor;
+
+public class ScatterCubes : MonoBehaviour
+{
+    public GameObject parentObject;
+    public float minRadius = 1.0f;
+    public float maxRadius = 500.0f;
+    public Vector3 minScale = new Vector3(10f, 20f, 0.5f);
+    public Vector3 maxScale = new Vector3(30f, 400f, 2.0f);
+    public Vector3 minRotation = new Vector3(10f, 0f, 0f);
+    public Vector3 maxRotation = new Vector3(45, 360, 0);
+
+    // Change the access level to public
+    public void ScatterRandomCubes()
+    {
+        if (parentObject == null)
+        {
+            Debug.LogError("Parent object not assigned!");
+            return;
+        }
+
+        foreach (Transform child in parentObject.transform)
+        {
+            // Random position within specified radius
+            Vector3 randomPosition = Random.insideUnitSphere * Random.Range(minRadius, maxRadius);
+            randomPosition.y = 0; // Optional: You can adjust the Y position if needed.
+
+            // Random rotation
+            Vector3 randomRotation = new Vector3(
+                Random.Range(minRotation.x, maxRotation.x),
+                Random.Range(minRotation.y, maxRotation.y),
+                Random.Range(minRotation.z, maxRotation.z)
+            );
+
+            // Random scale
+            Vector3 randomScale = new Vector3(
+                Random.Range(minScale.x, maxScale.x),
+                Random.Range(minScale.y, maxScale.y),
+                Random.Range(minScale.z, maxScale.z)
+            );
+
+            // Apply random transformation to the child object
+            child.localPosition = randomPosition;
+            child.localRotation = Quaternion.Euler(randomRotation);
+            child.localScale = randomScale;
+        }
+    }
+}
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(ScatterCubes))]
+public class ScatterCubesEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        ScatterCubes scatterScript = (ScatterCubes)target;
+
+        if (GUILayout.Button("Scatter Cubes"))
+        {
+            scatterScript.ScatterRandomCubes();
+        }
+    }
+}
+#endif
