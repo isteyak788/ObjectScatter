@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 public class ScatterCubes : MonoBehaviour
 {
-    public GameObject parentObject;
+    public List<GameObject> parentObjects = new List<GameObject>();
     public float minRadius = 1.0f;
     public float maxRadius = 500.0f;
     public Vector3 minScale = new Vector3(10f, 20f, 0.5f);
@@ -14,36 +15,45 @@ public class ScatterCubes : MonoBehaviour
     // Change the access level to public
     public void ScatterRandomCubes()
     {
-        if (parentObject == null)
+        if (parentObjects == null || parentObjects.Count == 0)
         {
-            Debug.LogError("Parent object not assigned!");
+            Debug.LogError("No parent objects assigned!");
             return;
         }
 
-        foreach (Transform child in parentObject.transform)
+        foreach (var parentObject in parentObjects)
         {
-            // Random position within specified radius
-            Vector3 randomPosition = Random.insideUnitSphere * Random.Range(minRadius, maxRadius);
-            randomPosition.y = 0; // Optional: You can adjust the Y position if needed.
+            if (parentObject == null)
+            {
+                Debug.LogWarning("Skipping null parent object in the list.");
+                continue;
+            }
 
-            // Random rotation
-            Vector3 randomRotation = new Vector3(
-                Random.Range(minRotation.x, maxRotation.x),
-                Random.Range(minRotation.y, maxRotation.y),
-                Random.Range(minRotation.z, maxRotation.z)
-            );
+            foreach (Transform child in parentObject.transform)
+            {
+                // Random position within specified radius
+                Vector3 randomPosition = Random.insideUnitSphere * Random.Range(minRadius, maxRadius);
+                randomPosition.y = 0; // Optional: You can adjust the Y position if needed.
 
-            // Random scale
-            Vector3 randomScale = new Vector3(
-                Random.Range(minScale.x, maxScale.x),
-                Random.Range(minScale.y, maxScale.y),
-                Random.Range(minScale.z, maxScale.z)
-            );
+                // Random rotation
+                Vector3 randomRotation = new Vector3(
+                    Random.Range(minRotation.x, maxRotation.x),
+                    Random.Range(minRotation.y, maxRotation.y),
+                    Random.Range(minRotation.z, maxRotation.z)
+                );
 
-            // Apply random transformation to the child object
-            child.localPosition = randomPosition;
-            child.localRotation = Quaternion.Euler(randomRotation);
-            child.localScale = randomScale;
+                // Random scale
+                Vector3 randomScale = new Vector3(
+                    Random.Range(minScale.x, maxScale.x),
+                    Random.Range(minScale.y, maxScale.y),
+                    Random.Range(minScale.z, maxScale.z)
+                );
+
+                // Apply random transformation to the child object
+                child.localPosition = randomPosition;
+                child.localRotation = Quaternion.Euler(randomRotation);
+                child.localScale = randomScale;
+            }
         }
     }
 }
